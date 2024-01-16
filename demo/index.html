@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>jquery-bs-circle-progress</title>
+    <link href="../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container py-5">
+    <h1>jquery-bs-circle-progress</h1>
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="my-3" data-bs-toggle="circle-progress"></div>
+    </div>
+</div>
+
+
+<script src="../vendor/components/jquery/jquery.min.js"></script>
+<script src="../vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../dist/jquery-bs-circle-progress.min.js"></script>
+<script>
+    (function ($) {
+
+        $('[data-bs-toggle="circle-progress"]').circleProgress({
+            size: 450,
+            value: 0,
+            progressClass: 'primary'
+        });
+
+        let seconds = 0;
+        setInterval(function(){
+            $('[data-bs-toggle="circle-progress"]').circleProgress('val', seconds);
+            seconds++;
+        },20)
+
+    }(jQuery));
+
+</script>
+</body>
+</html>
