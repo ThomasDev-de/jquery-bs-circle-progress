@@ -10,17 +10,18 @@
             size: 200,
             value: 0,
             background: 'transparent',
-            progressClass: 'primary'
+            color: 'primary'
         };
 
         const $element = $(this);
 
         function setValue(value) {
+            let showValue = value;
             if (value > 100) {
                 value = 100;
             }
-            $element.data('value', value);
-            $element.find('.js-prozess-value').text(Math.round(value));
+            $element.data('value', showValue);
+            $element.find('.js-prozess-value').text(Math.round(showValue));
             const left = $element.find('.progress-left .progress-bar');
             const right = $element.find('.progress-right .progress-bar');
             if (value > 0) {
@@ -36,16 +37,50 @@
             }
         }
 
+        function getColor(color){
+            if (['dark','secondary','light','info','warning','danger','success','primary'].includes(color)){
+                return {
+                    class: 'progress-bar border-'+color
+                }
+            }else{
+                return {
+                    class: 'progress-bar',
+                    css: {
+                        borderColor: color
+                    }
+                }
+            }
+        }
+        function getColorBackgroundColor(color){
+            if (['dark','secondary','light','info','warning','danger','success','primary','transparent'].includes(color)){
+                return {
+                    class: 'bg-'+color
+                }
+            }else{
+                return {
+                    css: {
+                        background: color
+                    }
+                }
+            }
+        }
+
         function build($e) {
             const settings = $e.data('settings');
+            const spanColor = getColor(settings.color);
+            const backgroundColor = getColorBackgroundColor(settings.background);
+            const backgroundCss = $.extend({
+                width: settings.size + 'px',
+                height: settings.size + 'px',
+                borderRadius: settings.size + 'px'
+            }, backgroundColor.css || {})
             $e
-                .addClass('shadow position-relative')
-                .css({
-                    width: settings.size + 'px',
-                    height: settings.size + 'px',
-                    borderRadius: settings.size + 'px',
-                    background: settings.background
-                });
+                .addClass('position-relative')
+                .css(backgroundCss);
+
+            if (backgroundColor.class){
+                $e.addClass(backgroundColor.class)
+            }
 
             const cssSpan = {
                 width: "50%",
@@ -82,8 +117,8 @@
             }).appendTo($e);
 
             $('<span>', {
-                class: 'progress-bar border-' + settings.progressClass,
-                css: leftProgressBarCss
+                class: spanColor.class,
+                css: spanColor.css ? $.extend(leftProgressBarCss, spanColor.css) : leftProgressBarCss
             }).appendTo(left);
 
             // right border
@@ -101,9 +136,10 @@
                 css: rightCSS
             }).appendTo($e);
 
+
             $('<span>', {
-                class: 'progress-bar border-' + settings.progressClass,
-                css: rightProgressBarCss
+                class: spanColor.class,
+                css: spanColor.css ? $.extend(rightProgressBarCss, spanColor.css) : rightProgressBarCss
             }).appendTo(right);
 
             // value container

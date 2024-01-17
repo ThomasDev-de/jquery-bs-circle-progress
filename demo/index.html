@@ -8,9 +8,11 @@
 </head>
 <body>
 <div class="container py-5">
-    <h1>jquery-bs-circle-progress</h1>
+    <h1 class="text-center">jquery-bs-circle-progress</h1>
     <div class="d-flex justify-content-center align-items-center">
-        <div class="my-3" data-bs-toggle="circle-progress"></div>
+        <div class="my-3" id="progress_3" data-bs-toggle="circle-progress"></div>
+        <div class="my-3 mx-3" id="progress_1" data-bs-toggle="circle-progress"></div>
+        <div class="my-3" id="progress_2" data-bs-toggle="circle-progress"></div>
     </div>
 </div>
 
@@ -21,17 +23,38 @@
 <script>
     (function ($) {
 
-        $('[data-bs-toggle="circle-progress"]').circleProgress({
-            size: 450,
+        function randomValue(min, max) { // min and max included
+            return Math.floor(Math.random() * (max - min + 1) + min)
+        }
+
+
+        $('#progress_1').circleProgress({
+            size: 350,
             value: 0,
-            progressClass: 'primary'
+            color: '#506886'
+        });
+
+        $('#progress_2').circleProgress({
+            size: 100,
+            value: randomValue(0,50),
+            color: 'secondary',
+        });
+        $('#progress_3').circleProgress({
+            size: 200,
+            value: randomValue(50,100),
+            color: 'purple'
         });
 
         let seconds = 0;
-        setInterval(function(){
-            $('[data-bs-toggle="circle-progress"]').circleProgress('val', seconds);
+        let testInterval = null;
+        testInterval = setInterval(function(){
+            if (seconds === 100){
+                clearInterval(testInterval)
+            }
+            $('#progress_1').circleProgress('val', seconds);
             seconds++;
-        },20)
+
+        },100)
 
     }(jQuery));
 
