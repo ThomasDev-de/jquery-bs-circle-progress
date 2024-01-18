@@ -1,6 +1,6 @@
 {
   "name": "webcito/jquery-bs-circle-progress",
-  "description": "description",
+  "description": "The plugin displays a process in the form of a circle using Bootstrap and jQuery.",
   "minimum-stability": "stable",
   "license": "proprietary",
   "authors": [
@@ -10,9 +10,9 @@
     }
   ],
   "require": {
-      "components/jquery": ">=3.6.0"
+      "components/jquery": ">=1.9"
   },
   "require-dev": {
-      "twbs/bootstrap": "v5.3.2"
+      "twbs/bootstrap": ">=v4.0.0"
   }
 }

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-bs-theme="light">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,7 +16,6 @@
     </div>
 </div>
 
-
 <script src="../vendor/components/jquery/jquery.min.js"></script>
 <script src="../vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="../dist/jquery-bs-circle-progress.min.js"></script>
@@ -31,7 +30,8 @@
         $('#progress_1').circleProgress({
             size: 350,
             value: 0,
-            color: '#506886'
+            color: '#506886',
+            progressWidth: 2
         });
 
         $('#progress_2').circleProgress({
@@ -42,7 +42,7 @@
         $('#progress_3').circleProgress({
             size: 200,
             value: randomValue(50,100),
-            color: 'purple'
+            color: 'purple',
         });
 
         let seconds = 0;
@@ -51,7 +51,29 @@
             if (seconds === 100){
                 clearInterval(testInterval)
             }
-            $('#progress_1').circleProgress('val', seconds);
+            let color;
+            switch(true){
+                case seconds < 20:
+                    color = 'danger';
+                    break;
+                case seconds < 40:
+                    color = 'warning';
+                    break;
+                case seconds < 60:
+                    color = 'info';
+                    break;
+                case seconds < 99:
+                    color = 'primary';
+                    break;
+                default:
+                    color = 'success';
+                    break;
+            }
+            $('#progress_1').circleProgress('updateOptions', {
+                value: seconds,
+
+                color: color
+            });
             seconds++;
 
         },100)

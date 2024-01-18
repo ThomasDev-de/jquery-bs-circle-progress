@@ -1,4 +1,4 @@
-(function($){
+(function ($) {
     $.fn.circleProgress = function (options, params) {
         if ($(this).length > 1) {
             return $(this).each(function (i, e) {
@@ -10,7 +10,8 @@
             size: 200,
             value: 0,
             background: 'transparent',
-            color: 'primary'
+            color: 'primary',
+            progressWidth: null
         };
 
         const $element = $(this);
@@ -37,12 +38,12 @@
             }
         }
 
-        function getColor(color){
-            if (['dark','secondary','light','info','warning','danger','success','primary'].includes(color)){
+        function getColor(color) {
+            if (['dark', 'secondary', 'light', 'info', 'warning', 'danger', 'success', 'primary'].includes(color)) {
                 return {
-                    class: 'progress-bar border-'+color
+                    class: 'progress-bar border-' + color
                 }
-            }else{
+            } else {
                 return {
                     class: 'progress-bar',
                     css: {
@@ -51,12 +52,13 @@
                 }
             }
         }
-        function getColorBackgroundColor(color){
-            if (['dark','secondary','light','info','warning','danger','success','primary','transparent'].includes(color)){
+
+        function getColorBackgroundColor(color) {
+            if (['dark', 'secondary', 'light', 'info', 'warning', 'danger', 'success', 'primary', 'transparent'].includes(color)) {
                 return {
-                    class: 'bg-'+color
+                    class: 'bg-' + color
                 }
-            }else{
+            } else {
                 return {
                     css: {
                         background: color
@@ -68,9 +70,14 @@
         function build($e) {
             const settings = $e.data('settings');
             const spanColor = getColor(settings.color);
+            const borderWidth = settings.progressWidth ?? (settings.size / 10);
             const backgroundColor = getColorBackgroundColor(settings.background);
             const backgroundCss = $.extend({
+                maxWidth: settings.size + 'px',
+                minWidth: settings.size + 'px',
                 width: settings.size + 'px',
+                maxHeight: settings.size + 'px',
+                minHeight: settings.size + 'px',
                 height: settings.size + 'px',
                 borderRadius: settings.size + 'px'
             }, backgroundColor.css || {})
@@ -78,7 +85,7 @@
                 .addClass('position-relative')
                 .css(backgroundCss);
 
-            if (backgroundColor.class){
+            if (backgroundColor.class) {
                 $e.addClass(backgroundColor.class)
             }
 
@@ -94,7 +101,7 @@
                 width: "100%",
                 height: "100%",
                 background: "none",
-                borderWidth: (settings.size / 10) + "px",
+                borderWidth: borderWidth + "px",
                 borderStyle: "solid",
                 position: "absolute",
                 top: 0,
@@ -105,8 +112,8 @@
             const leftCSS = $.extend(structuredClone(cssSpan), {left: 0});
             const leftProgressBarCss = $.extend(structuredClone(cssSpan), structuredClone(progressBarCss), {
                 left: "100%",
-                borderTopRightRadius: (settings.size / 2 + (settings.size / 10)) + "px",
-                borderBottomRightRadius: (settings.size / 2 + (settings.size / 10)) + "px",
+                borderTopRightRadius: (settings.size / 2 + borderWidth) + "px",
+                borderBottomRightRadius: (settings.size / 2 + borderWidth) + "px",
                 borderLeft: 0,
                 transformOrigin: "center left"
             });
@@ -125,8 +132,8 @@
             const rightCSS = $.extend(structuredClone(cssSpan), {right: 0});
             const rightProgressBarCss = $.extend(structuredClone(cssSpan), structuredClone(progressBarCss), {
                 left: "-100%",
-                borderTopLeftRadius: (settings.size / 2 +  (settings.size / 10)) + "px",
-                borderBottomLeftRadius: (settings.size / 2 +  (settings.size / 10)) + "px",
+                borderTopLeftRadius: (settings.size / 2 + borderWidth) + "px",
+                borderBottomLeftRadius: (settings.size / 2 + borderWidth) + "px",
                 borderRight: 0,
                 transformOrigin: "center right"
             });
@@ -153,7 +160,7 @@
                     overflow: 'hidden',
                     zIndex: 0,
                     fontSize: (settings.size / 5) + 'px',
-                    borderWidth: (settings.size / 10) + "px",
+                    borderWidth: borderWidth + "px",
                     borderStyle: 'solid',
                     borderColor: 'rgb(128, 128, 128, .3)'
                 },
@@ -161,12 +168,17 @@
                 html: '<div class=" font-weight-bold m-0"><span class="js-prozess-value"></span><sup class="small">%</sup></div>'
             }).appendTo($e);
 
+
             setValue($element.data('value') || settings.value);
         }
 
         function percentageToDegrees(percentage) {
 
             return percentage / 100 * 360
+
+        }
+
+        function events($e) {
 
         }
 
@@ -182,7 +194,7 @@
                 }
 
                 build($element);
-
+                events($element);
                 $element.data('init', true);
             }
         }
