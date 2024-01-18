@@ -50,12 +50,13 @@ That's it!
 
 ## Plugin options
 
-| prop       | type   | default       | description                                                                                                                |
-|------------|--------|---------------|----------------------------------------------------------------------------------------------------------------------------|
-| size       | number | 200           | The size of the circle                                                                                                     |
-| value      | number | 0             | The predefined value of progress                                                                                           |             
-| color      | string | 'primary'     | The color of the progress. It can be a bootstrap class ('primary', 'secondary', etc.) or a CSS property (rgb(20,20,20)).   |
-| background | string | 'transparent' | The color of the background. It can be a bootstrap class ('primary', 'secondary', etc.) or a CSS property (rgb(20,20,20)). |
+| prop          | type   | default       | description                                                                                                                |
+|---------------|--------|---------------|----------------------------------------------------------------------------------------------------------------------------|
+| size          | number | 200           | The size of the circle                                                                                                     |
+| value         | number | 0             | The predefined value of progress                                                                                           |             
+| color         | string | 'primary'     | The color of the progress. It can be a bootstrap class ('primary', 'secondary', etc.) or a CSS property (rgb(20,20,20)).   |
+| background    | string | 'transparent' | The color of the background. It can be a bootstrap class ('primary', 'secondary', etc.) or a CSS property (rgb(20,20,20)). |
+| progressWidth | number | null          | The thickness of the progress bar. If no value is specified, the thickness is calculated automatically using the circle.   |
 
 ### example
 
@@ -85,12 +86,12 @@ That's it!
 
 let seconds = 0;
 let testInterval = null;
-testInterval = setInterval(function(){
-    if (seconds === 100){
+testInterval = setInterval(function () {
+    if (seconds === 100) {
         clearInterval(testInterval)
     }
     let color;
-    switch(true){
+    switch (true) {
         case seconds < 20:
             color = 'danger';
             break;
@@ -112,6 +113,6 @@ testInterval = setInterval(function(){
         color: color
     });
     seconds++;
-},100)
+}, 100)
 ```
 
