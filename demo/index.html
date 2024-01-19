@@ -26,7 +26,6 @@
             return Math.floor(Math.random() * (max - min + 1) + min)
         }
 
-
         $('#progress_1').circleProgress({
             size: 350,
             value: 0,
@@ -35,14 +34,17 @@
         });
 
         $('#progress_2').circleProgress({
-            size: 100,
+            size:140,
             value: randomValue(0,50),
             color: 'secondary',
+            progressWidth: 4
         });
+
         $('#progress_3').circleProgress({
             size: 200,
             value: randomValue(50,100),
             color: 'purple',
+            progressWidth: 10
         });
 
         let seconds = 0;
@@ -76,7 +78,7 @@
             });
             seconds++;
 
-        },100)
+        },40)
 
     }(jQuery));
 
