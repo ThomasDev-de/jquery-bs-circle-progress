@@ -18,6 +18,9 @@
 
         function setValue(value) {
             let showValue = value;
+            if (value < 0) {
+                value = 0;
+            }
             if (value > 100) {
                 value = 100;
             }
@@ -27,10 +30,11 @@
             const right = $element.find('.progress-right .progress-bar');
             if (value > 0) {
                 if (value <= 50) {
-                    right.css('transform', 'rotate(' + percentageToDegrees(value) + 'deg)')
+                    right.css('transform', 'rotate(' + percentageToDegrees(value) + 'deg)');
+                    left.css('transform', 'rotate(0deg)');
                 } else {
-                    right.css('transform', 'rotate(180deg)')
-                    left.css('transform', 'rotate(' + percentageToDegrees(value - 50) + 'deg)')
+                    right.css('transform', 'rotate(180deg)');
+                    left.css('transform', 'rotate(' + percentageToDegrees(value - 50) + 'deg)');
                 }
             } else {
                 left.css('transform', 'rotate(0deg)');
@@ -169,7 +173,7 @@
             }).appendTo($e);
 
 
-            setValue($element.data('value') || settings.value);
+            setValue($element.data('value') ?? settings.value);
         }
 
         function percentageToDegrees(percentage) {
@@ -209,12 +213,11 @@
                 }
                 case 'updateOptions': {
                     const beforeOptions = $element.data('settings') || DEFAULTS;
-                    const beforeValue = $element.data('value');
                     const newOptions = $.extend(beforeOptions, params);
                     $element.data('settings', newOptions);
                     $element.empty();
                     build($element);
-                    if (params.value) {
+                    if (params && Object.prototype.hasOwnProperty.call(params, 'value')) {
                         setValue(params.value)
                     }
                     break;
