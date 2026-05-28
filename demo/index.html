@@ -32,10 +32,6 @@
                         <div id="progress_css" data-bs-toggle="circle-progress"></div>
                         <p class="small mt-2 mb-0 text-secondary">Raw CSS colors</p>
                     </div>
-                    <div class="text-center">
-                        <div id="progress_dynamic" data-bs-toggle="circle-progress"></div>
-                        <p class="small mt-2 mb-0 text-secondary">Animated via <code>updateOptions</code></p>
-                    </div>
                 </div>
             </div>
         </div>
@@ -109,14 +105,6 @@
             progressWidth: 8
         });
 
-        $('#progress_dynamic').circleProgress({
-            size: 200,
-            value: 0,
-            color: 'info',
-            background: 'transparent',
-            progressWidth: 12
-        });
-
         $('#playground').circleProgress({
             size: 180,
             value: 35,
@@ -124,38 +112,6 @@
             background: 'dark',
             progressWidth: 12
         });
-
-        let tick = 0;
-        const dynamicTimer = setInterval(function () {
-            if (tick > 100) {
-                clearInterval(dynamicTimer);
-                return;
-            }
-            let color;
-            switch (true) {
-                case tick < 20:
-                    color = 'danger';
-                    break;
-                case tick < 40:
-                    color = 'warning';
-                    break;
-                case tick < 60:
-                    color = 'info';
-                    break;
-                case tick < 80:
-                    color = 'primary';
-                    break;
-                default:
-                    color = 'success';
-                    break;
-            }
-
-            $('#progress_dynamic').circleProgress('updateOptions', {
-                value: tick,
-                color: color
-            });
-            tick++;
-        }, 45);
 
         $('#value_input').on('input', function () {
             $('#value_display').text(this.value);
