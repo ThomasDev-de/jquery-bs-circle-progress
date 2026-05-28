@@ -3,7 +3,7 @@
         if ($(this).length > 1) {
             return $(this).each(function (i, e) {
                 return $(e).circleProgress(options, params);
-            })
+            });
         }
 
         const DEFAULTS = {
@@ -11,12 +11,43 @@
             value: 0,
             background: 'transparent',
             color: 'primary',
-            progressWidth: null
+            progressWidth: null,
+            animated: true
         };
 
         const $element = $(this);
 
+        function getProgressColor(color) {
+            if (['dark', 'secondary', 'light', 'info', 'warning', 'danger', 'success', 'primary'].includes(color)) {
+                const $tmp = $('<span>', {
+                    class: 'border border-' + color,
+                    css: {
+                        position: 'absolute',
+                        visibility: 'hidden'
+                    }
+                }).appendTo(document.body);
+                const resolvedColor = $tmp.css('border-top-color');
+                $tmp.remove();
+                return resolvedColor;
+            }
+            return color;
+        }
+
+        function getColorBackgroundColor(color) {
+            if (['dark', 'secondary', 'light', 'info', 'warning', 'danger', 'success', 'primary', 'transparent'].includes(color)) {
+                return {
+                    class: 'bg-' + color
+                };
+            }
+            return {
+                css: {
+                    background: color
+                }
+            };
+        }
+
         function setValue(value) {
+            const settings = $element.data('settings') || DEFAULTS;
             let showValue = value;
             if (value < 0) {
                 value = 0;
@@ -24,58 +55,34 @@
             if (value > 100) {
                 value = 100;
             }
+
             $element.data('value', showValue);
             $element.find('.js-prozess-value').text(Math.round(showValue));
-            const left = $element.find('.progress-left .progress-bar');
-            const right = $element.find('.progress-right .progress-bar');
-            if (value > 0) {
-                if (value <= 50) {
-                    right.css('transform', 'rotate(' + percentageToDegrees(value) + 'deg)');
-                    left.css('transform', 'rotate(0deg)');
-                } else {
-                    right.css('transform', 'rotate(180deg)');
-                    left.css('transform', 'rotate(' + percentageToDegrees(value - 50) + 'deg)');
-                }
-            } else {
-                left.css('transform', 'rotate(0deg)');
-                right.css('transform', 'rotate(0deg)');
-            }
-        }
 
-        function getColor(color) {
-            if (['dark', 'secondary', 'light', 'info', 'warning', 'danger', 'success', 'primary'].includes(color)) {
-                return {
-                    class: 'progress-bar border-' + color
-                }
-            } else {
-                return {
-                    class: 'progress-bar',
-                    css: {
-                        borderColor: color
-                    }
-                }
-            }
-        }
+            const $progressCircle = $element.find('.js-progress-circle');
+            const radius = parseFloat($progressCircle.attr('r') || '0');
+            const circumference = 2 * Math.PI * radius;
+            const progress = value / 100;
+            const offset = circumference * (1 - progress);
+            $progressCircle.css('stroke-dashoffset', offset + 'px');
+            $progressCircle.attr('aria-valuenow', Math.round(value));
 
-        function getColorBackgroundColor(color) {
-            if (['dark', 'secondary', 'light', 'info', 'warning', 'danger', 'success', 'primary', 'transparent'].includes(color)) {
-                return {
-                    class: 'bg-' + color
-                }
+            if (settings.animated) {
+                $progressCircle.css('transition', 'stroke-dashoffset .6s ease');
             } else {
-                return {
-                    css: {
-                        background: color
-                    }
-                }
+                $progressCircle.css('transition', 'none');
             }
         }
 
         function build($e) {
             const settings = $e.data('settings');
-            const spanColor = getColor(settings.color);
             const borderWidth = settings.progressWidth ?? (settings.size / 10);
             const backgroundColor = getColorBackgroundColor(settings.background);
+            const progressColor = getProgressColor(settings.color);
+            const radius = (settings.size / 2) - (borderWidth / 2);
+            const circumference = 2 * Math.PI * radius;
+            const trackColor = 'rgb(128 128 128 / 0.3)';
+
             const backgroundCss = $.extend({
                 maxWidth: settings.size + 'px',
                 minWidth: settings.size + 'px',
@@ -84,106 +91,91 @@
                 minHeight: settings.size + 'px',
                 height: settings.size + 'px',
                 borderRadius: settings.size + 'px'
-            }, backgroundColor.css || {})
+            }, backgroundColor.css || {});
+
             $e
                 .addClass('position-relative')
                 .css(backgroundCss);
 
             if (backgroundColor.class) {
-                $e.addClass(backgroundColor.class)
+                $e.addClass(backgroundColor.class);
             }
 
-            const cssSpan = {
-                width: "50%",
-                height: "100%",
-                overflow: 'hidden',
+            const svgNs = 'http://www.w3.org/2000/svg';
+            const svgEl = document.createElementNS(svgNs, 'svg');
+            svgEl.setAttribute('class', 'js-circle-svg');
+            svgEl.setAttribute('viewBox', '0 0 ' + settings.size + ' ' + settings.size);
+
+            const trackCircleEl = document.createElementNS(svgNs, 'circle');
+            trackCircleEl.setAttribute('class', 'js-track-circle');
+            trackCircleEl.setAttribute('cx', String(settings.size / 2));
+            trackCircleEl.setAttribute('cy', String(settings.size / 2));
+            trackCircleEl.setAttribute('r', String(radius));
+            trackCircleEl.setAttribute('fill', 'none');
+
+            const progressCircleEl = document.createElementNS(svgNs, 'circle');
+            progressCircleEl.setAttribute('class', 'js-progress-circle');
+            progressCircleEl.setAttribute('cx', String(settings.size / 2));
+            progressCircleEl.setAttribute('cy', String(settings.size / 2));
+            progressCircleEl.setAttribute('r', String(radius));
+            progressCircleEl.setAttribute('fill', 'none');
+            progressCircleEl.setAttribute('role', 'progressbar');
+            progressCircleEl.setAttribute('aria-valuemin', '0');
+            progressCircleEl.setAttribute('aria-valuemax', '100');
+
+            svgEl.appendChild(trackCircleEl);
+            svgEl.appendChild(progressCircleEl);
+            $e.append(svgEl);
+
+            const $trackCircle = $e.find('.js-track-circle');
+            const $progressCircle = $e.find('.js-progress-circle');
+            const $svg = $e.find('.js-circle-svg');
+
+            $svg.css({
                 position: 'absolute',
                 top: 0,
-                zIndex: 1
-            };
-            const progressBarCss = {
-                width: "100%",
-                height: "100%",
-                background: "none",
-                borderWidth: borderWidth + "px",
-                borderStyle: "solid",
-                position: "absolute",
-                top: 0,
-                zIndex: 2
-            };
-
-            // left border
-            const leftCSS = $.extend(structuredClone(cssSpan), {left: 0});
-            const leftProgressBarCss = $.extend(structuredClone(cssSpan), structuredClone(progressBarCss), {
-                left: "100%",
-                borderTopRightRadius: (settings.size / 2 + borderWidth) + "px",
-                borderBottomRightRadius: (settings.size / 2 + borderWidth) + "px",
-                borderLeft: 0,
-                transformOrigin: "center left"
+                left: 0,
+                width: '100%',
+                height: '100%',
+                transform: 'rotate(-90deg)',
+                overflow: 'visible'
             });
 
-            const left = $('<span>', {
-                class: 'progress-left',
-                css: leftCSS
-            }).appendTo($e);
-
-            $('<span>', {
-                class: spanColor.class,
-                css: spanColor.css ? $.extend(leftProgressBarCss, spanColor.css) : leftProgressBarCss
-            }).appendTo(left);
-
-            // right border
-            const rightCSS = $.extend(structuredClone(cssSpan), {right: 0});
-            const rightProgressBarCss = $.extend(structuredClone(cssSpan), structuredClone(progressBarCss), {
-                left: "-100%",
-                borderTopLeftRadius: (settings.size / 2 + borderWidth) + "px",
-                borderBottomLeftRadius: (settings.size / 2 + borderWidth) + "px",
-                borderRight: 0,
-                transformOrigin: "center right"
+            $trackCircle.css({
+                stroke: trackColor,
+                strokeWidth: borderWidth + 'px'
             });
 
-            const right = $('<span>', {
-                class: 'progress-right',
-                css: rightCSS
-            }).appendTo($e);
+            $progressCircle.css({
+                stroke: progressColor,
+                strokeWidth: borderWidth + 'px',
+                strokeLinecap: 'round',
+                strokeDasharray: circumference + 'px',
+                strokeDashoffset: circumference + 'px'
+            });
 
-
-            $('<span>', {
-                class: spanColor.class,
-                css: spanColor.css ? $.extend(rightProgressBarCss, spanColor.css) : rightProgressBarCss
-            }).appendTo(right);
-
-            // value container
             $('<div>', {
+                class: 'progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center position-absolute',
                 css: {
-                    position: 'absolute',
                     top: 0,
                     left: 0,
-                    width: '50%',
-                    height: '100%',
-                    overflow: 'hidden',
-                    zIndex: 0,
-                    fontSize: (settings.size / 5) + 'px',
-                    borderWidth: borderWidth + "px",
-                    borderStyle: 'solid',
-                    borderColor: 'rgb(128, 128, 128, .3)'
+                    fontSize: (settings.size / 5) + 'px'
                 },
-                class: 'progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center',
-                html: '<div class=" font-weight-bold m-0"><span class="js-prozess-value"></span><sup class="small">%</sup></div>'
+                html: '<div class="font-weight-bold m-0"><span class="js-prozess-value"></span><sup class="small">%</sup></div>'
             }).appendTo($e);
 
-
-            setValue($element.data('value') ?? settings.value);
-        }
-
-        function percentageToDegrees(percentage) {
-
-            return percentage / 100 * 360
-
+            const initialValue = $element.data('value') ?? settings.value;
+            if (settings.animated) {
+                setValue(0);
+                requestAnimationFrame(function () {
+                    setValue(initialValue);
+                });
+            } else {
+                setValue(initialValue);
+            }
         }
 
         function events($e) {
-
         }
 
         function init() {
@@ -218,7 +210,7 @@
                     $element.empty();
                     build($element);
                     if (params && Object.prototype.hasOwnProperty.call(params, 'value')) {
-                        setValue(params.value)
+                        setValue(params.value);
                     }
                     break;
                 }
@@ -228,7 +220,7 @@
 
         return $element;
 
-    }
+    };
 
 
 }(jQuery));

@@ -57,6 +57,7 @@ That's it!
 | color         | string | 'primary'     | The color of the progress. It can be a bootstrap class ('primary', 'secondary', etc.) or a CSS property (rgb(20,20,20)).   |
 | background    | string | 'transparent' | The color of the background. It can be a bootstrap class ('primary', 'secondary', etc.) or a CSS property (rgb(20,20,20)). |
 | progressWidth | number | null          | The thickness of the progress bar. If no value is specified, the thickness is calculated automatically using the circle.   |
+| animated      | bool   | true          | Enables animation when the progress is rendered or updated. Set to `false` to disable transitions.                        |
 
 ### example
 
@@ -115,4 +116,3 @@ testInterval = setInterval(function () {
     seconds++;
 }, 100)
 ```
-
