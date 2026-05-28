@@ -3,16 +3,80 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>jquery-bs-circle-progress</title>
+    <title>jQuery BS Circle Progress - Demo</title>
     <link href="../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container py-5">
-    <h1 class="text-center">jquery-bs-circle-progress</h1>
-    <div class="d-flex justify-content-center align-items-center">
-        <div class="my-3" id="progress_3" data-bs-toggle="circle-progress"></div>
-        <div class="my-3 mx-3" id="progress_1" data-bs-toggle="circle-progress"></div>
-        <div class="my-3" id="progress_2" data-bs-toggle="circle-progress"></div>
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="mb-2">jQuery BS Circle Progress</h1>
+            <p class="text-secondary mb-0">Feature demo: defaults, custom colors/backgrounds, sizing, and methods.</p>
+        </div>
+    </div>
+
+    <div class="row g-4 align-items-start">
+        <div class="col-lg-7">
+            <div class="p-3 border rounded">
+                <h2 class="h5 mb-3">Live Previews</h2>
+                <div class="d-flex flex-wrap gap-4 align-items-center justify-content-center justify-content-lg-start">
+                    <div class="text-center">
+                        <div id="progress_default" data-bs-toggle="circle-progress"></div>
+                        <p class="small mt-2 mb-0 text-secondary">Default setup</p>
+                    </div>
+                    <div class="text-center">
+                        <div id="progress_bootstrap" data-bs-toggle="circle-progress"></div>
+                        <p class="small mt-2 mb-0 text-secondary">Bootstrap color/background</p>
+                    </div>
+                    <div class="text-center">
+                        <div id="progress_css" data-bs-toggle="circle-progress"></div>
+                        <p class="small mt-2 mb-0 text-secondary">Raw CSS colors</p>
+                    </div>
+                    <div class="text-center">
+                        <div id="progress_dynamic" data-bs-toggle="circle-progress"></div>
+                        <p class="small mt-2 mb-0 text-secondary">Animated via <code>updateOptions</code></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="p-3 border rounded">
+                <h2 class="h5 mb-3">Method Playground</h2>
+
+                <div id="playground" class="mb-3 d-flex justify-content-center"></div>
+
+                <div class="mb-3">
+                    <label for="value_input" class="form-label">Value (<span id="value_display">35</span>%)</label>
+                    <input id="value_input" type="range" class="form-range" min="0" max="100" value="35">
+                </div>
+
+                <div class="mb-3">
+                    <label for="size_input" class="form-label">Size (px)</label>
+                    <input id="size_input" type="number" class="form-control" min="80" max="420" step="10" value="180">
+                </div>
+
+                <div class="mb-3">
+                    <label for="width_input" class="form-label">Progress Width (px)</label>
+                    <input id="width_input" type="number" class="form-control" min="1" max="40" step="1" value="12">
+                </div>
+
+                <div class="mb-3">
+                    <label for="color_input" class="form-label">Progress Color (Bootstrap or CSS)</label>
+                    <input id="color_input" type="text" class="form-control" value="warning">
+                </div>
+
+                <div class="mb-3">
+                    <label for="background_input" class="form-label">Background (Bootstrap or CSS)</label>
+                    <input id="background_input" type="text" class="form-control" value="dark">
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button id="apply_options" class="btn btn-primary">Apply with updateOptions</button>
+                    <button id="set_value" class="btn btn-outline-light">Set value with val</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -21,64 +85,102 @@
 <script src="../dist/jquery-bs-circle-progress.min.js"></script>
 <script>
     (function ($) {
-
-        function randomValue(min, max) { // min and max included
-            return Math.floor(Math.random() * (max - min + 1) + min)
+        function randomValue(min, max) {
+            return Math.floor(Math.random() * (max - min + 1) + min);
         }
 
-        $('#progress_1').circleProgress({
-            size: 350,
-            value: 0,
-            color: '#506886',
-            progressWidth: 2
+        $('#progress_default').circleProgress({
+            value: 67
         });
 
-        $('#progress_2').circleProgress({
-            size:140,
-            value: randomValue(0,50),
-            color: 'secondary',
-            progressWidth: 4
-        });
-
-        $('#progress_3').circleProgress({
-            size: 200,
-            value: randomValue(50,100),
-            color: 'purple',
+        $('#progress_bootstrap').circleProgress({
+            size: 160,
+            value: randomValue(20, 90),
+            color: 'success',
+            background: 'secondary',
             progressWidth: 10
         });
 
-        let seconds = 0;
-        let testInterval = null;
-        testInterval = setInterval(function(){
-            if (seconds === 100){
-                clearInterval(testInterval)
+        $('#progress_css').circleProgress({
+            size: 150,
+            value: randomValue(10, 80),
+            color: '#7dd3fc',
+            background: 'rgba(125, 211, 252, 0.12)',
+            progressWidth: 8
+        });
+
+        $('#progress_dynamic').circleProgress({
+            size: 200,
+            value: 0,
+            color: 'info',
+            background: 'transparent',
+            progressWidth: 12
+        });
+
+        $('#playground').circleProgress({
+            size: 180,
+            value: 35,
+            color: 'warning',
+            background: 'dark',
+            progressWidth: 12
+        });
+
+        let tick = 0;
+        const dynamicTimer = setInterval(function () {
+            if (tick > 100) {
+                clearInterval(dynamicTimer);
+                return;
             }
             let color;
-            switch(true){
-                case seconds < 20:
+            switch (true) {
+                case tick < 20:
                     color = 'danger';
                     break;
-                case seconds < 40:
+                case tick < 40:
                     color = 'warning';
                     break;
-                case seconds < 60:
+                case tick < 60:
                     color = 'info';
                     break;
-                case seconds < 99:
+                case tick < 80:
                     color = 'primary';
                     break;
                 default:
                     color = 'success';
                     break;
             }
-            $('#progress_1').circleProgress('updateOptions', {
-                value: seconds,
 
+            $('#progress_dynamic').circleProgress('updateOptions', {
+                value: tick,
                 color: color
             });
-            seconds++;
+            tick++;
+        }, 45);
 
-        },40)
+        $('#value_input').on('input', function () {
+            $('#value_display').text(this.value);
+        });
+
+        $('#set_value').on('click', function () {
+            const value = parseInt($('#value_input').val(), 10) || 0;
+            $('#playground').circleProgress('val', value);
+        });
+
+        $('#apply_options').on('click', function () {
+            const value = parseInt($('#value_input').val(), 10) || 0;
+            const size = parseInt($('#size_input').val(), 10) || 180;
+            const progressWidth = parseInt($('#width_input').val(), 10) || null;
+            const color = $('#color_input').val() || 'primary';
+            const background = $('#background_input').val() || 'transparent';
+
+            $('#playground').circleProgress('updateOptions', {
+                value: value,
+                size: size,
+                progressWidth: progressWidth,
+                color: color,
+                background: background
+            });
+        });
 
     }(jQuery));
 
